@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import (
+    UnitOfPressure,
+    UnitOfTime,
+)
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from .const import DOMAIN
+from .coordinator import GlpDataCoordinator
+
+
+@dataclass(frozen=True)
+class GlpSensorDescription(SensorEntityDescription):
+    data_key: str = ""
+
+
+SENSORS: tuple[GlpSensorDescription, ...] = (
+    GlpSensorDescription(
+        key="machine_status",
+        data_key="machine_status",
+        name="Machine Status",
+        icon="mdi:coffee-maker",
+    ),
+    GlpSensorDescription(
+        key="shot_count",
+        data_key="shot_count",
+        name="Shot Count",
+        icon="mdi:counter",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement="shots",
+    ),
+    GlpSensorDescription(
+        key="last_shot_profile",
+        data_key="last_shot_profile",
+        name="Last Shot Profile",
+        icon="mdi:chart-bell-curve",
+    ),
+    GlpSensorDescription(
+        key="last_shot_score",
+        data_key="last_shot_score",
+        name="Last Shot Score",
+        icon="mdi:star-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    GlpSensorDescription(
+        key="last_shot_date",
+        data_key="last_shot_date",
+        name="Last Shot Date",
+        icon="mdi:calendar-clock",
+        device_class=SensorDeviceClass.TIMESTAMP,
+    ),
+    GlpSensorDescription(
+        key="last_shot_duration",
+        data_key="last_shot_duration",
+        name="Last Shot Duration",
+        icon="mdi:timer-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_display_precision=1,
+    ),
+    GlpSensorDescription(
+        key="last_shot_pressure",
+        data_key="last_shot_pressure",
+        name="Last Shot Avg Pressure",
+        icon="mdi:gauge",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.BAR,
+        suggested_display_precision=2,
+    ),
+    GlpSensorDescription(
+        key="last_shot_weight",
+        data_key="last_shot_weight",
+        name="Last Shot Yield",
+        icon="mdi:scale",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="g",
+        suggested_display_precision=1,
+    ),
+    GlpSensorDescription(
+        key="last_shot_ratio",
+        data_key="last_shot_ratio",
+        name="Last Shot Brew Ratio",
+        icon="mdi:approximately-equal",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=2,
+    ),
+    GlpSensorDescription(
+        key="last_shot_dose",
+        data_key="last_shot_dose",
+        name="Last Shot Dose",
+        icon="mdi:coffee",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="g",
+        suggested_display_precision=1,
+    ),
+    GlpSensorDescription(
+        key="last_shot_coffee",
+        data_key="last_shot_coffee",
+        name="Last Shot Coffee",
+        icon="mdi:coffee-outline",
+    ),
+    GlpSensorDescription(
+        key="last_shot_grinder",
+        data_key="last_shot_grinder",
+        name="Last Shot Grinder",
+        icon="mdi:blender-outline",
+    ),
+    GlpSensorDescription(
+        key="last_sync",
+        data_key="last_sync",
+        name="Last Sync",
+        icon="mdi:sync",
+        device_class=SensorDeviceClass.TIMESTAMP,
+    ),
+    GlpSensorDescription(
+        key="machine_url",
+        data_key="machine_url",
+        name="Machine Hostname",
+        icon="mdi:lan",
+    ),
+)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]
+    async_add_entities(
+        GlpSensor(coordinator, entry, description) for description in SENSORS
+    )
+
+
+class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: GlpDataCoordinator,
+        entry: ConfigEntry,
+        description: GlpSensorDescription,
+    ) -> None:
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Gaggiuino Local Profiler",
+            manufacturer="Gaggiuino",
+            model="Local Profiler",
+            configuration_url=entry.data["url"],
+        )
+
+    @property
+    def native_value(self) -> Any:
+        return self.coordinator.data.get(self.entity_description.data_key)
