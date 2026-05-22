@@ -1,5 +1,5 @@
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 import aiohttp
 from homeassistant.core import HomeAssistant
@@ -10,16 +10,33 @@ from .const import DOMAIN, SCAN_INTERVAL_SECONDS
 _LOGGER = logging.getLogger(__name__)
 
 
+def _parse_ts(value: object) -> datetime | None:
+    if value is None:
+        return None
+    try:
+        if isinstance(value, (int, float)):
+            # Unix ms timestamp
+            return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
+        s = str(value)
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except Exception:
+        return None
+
+
 class GlpDataCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str):
+    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str, scan_interval: int = SCAN_INTERVAL_SECONDS):
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=SCAN_INTERVAL_SECONDS),
+            update_interval=timedelta(seconds=scan_interval),
         )
         self._session = session
         self._url     = url.rstrip("/")
+        self._last_shot_id: int | None = None
 
     async def _async_update_data(self) -> dict:
         try:
@@ -56,13 +73,15 @@ class GlpDataCoordinator(DataUpdateCoordinator):
             except (ValueError, ZeroDivisionError):
                 pass
 
-        return {
+        current_shot_id = last.get("id")
+
+        data = {
             "machine_status":      "online" if not status.get("lastSyncError") else "error",
             "shot_count":          status.get("shotCount", 0),
-            "last_shot_id":        last.get("id"),
+            "last_shot_id":        current_shot_id,
             "last_shot_profile":   last.get("profileName") or last.get("profile", {}).get("name"),
             "last_shot_score":     last.get("annotation", {}).get("score") if last else None,
-            "last_shot_date":      last.get("timestamp"),
+            "last_shot_date":      _parse_ts(last.get("timestamp")),
             "last_shot_duration":  duration_s,
             "last_shot_pressure":  avg_pressure,
             "last_shot_weight":    yield_g,
@@ -70,6 +89,26 @@ class GlpDataCoordinator(DataUpdateCoordinator):
             "last_shot_coffee":    ann.get("coffee"),
             "last_shot_grinder":   ann.get("grinder"),
             "last_shot_dose":      float(dose) if dose else None,
-            "last_sync":           status.get("lastSync"),
+            "last_sync":           _parse_ts(status.get("lastSync")),
             "machine_url":         status.get("machineHostname"),
         }
+
+        if current_shot_id and current_shot_id != self._last_shot_id and self._last_shot_id is not None:
+            self.hass.bus.async_fire(
+                f"{DOMAIN}_shot_completed",
+                {
+                    "shot_id":      current_shot_id,
+                    "profile":      data["last_shot_profile"],
+                    "duration_s":   data["last_shot_duration"],
+                    "yield_g":      data["last_shot_weight"],
+                    "dose_g":       data["last_shot_dose"],
+                    "ratio":        data["last_shot_ratio"],
+                    "avg_pressure": data["last_shot_pressure"],
+                    "score":        data["last_shot_score"],
+                    "coffee":       data["last_shot_coffee"],
+                    "grinder":      data["last_shot_grinder"],
+                },
+            )
+
+        self._last_shot_id = current_shot_id
+        return data

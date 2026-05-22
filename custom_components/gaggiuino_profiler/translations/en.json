@@ -15,5 +15,16 @@
     "abort": {
       "already_configured": "This GLP instance is already configured."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Gaggiuino Local Profiler Options",
+        "data": {
+          "url": "GLP URL",
+          "scan_interval": "Poll interval (seconds)"
+        }
+      }
+    }
   }
 }

@@ -141,7 +141,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
     async_add_entities(
         GlpSensor(coordinator, entry, description) for description in SENSORS
     )

@@ -3,10 +3,11 @@ from __future__ import annotations
 import aiohttp
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DEFAULT_URL, DOMAIN
+from .const import CONF_SCAN_INTERVAL, DEFAULT_URL, DOMAIN, SCAN_INTERVAL_SECONDS
 
 
 class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -42,4 +43,35 @@ class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
                 {vol.Required("url", default=DEFAULT_URL): str}
             ),
             errors=errors,
+        )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        return GlpOptionsFlow(config_entry)
+
+
+class GlpOptionsFlow(OptionsFlow):
+    def __init__(self, entry: ConfigEntry) -> None:
+        self._entry = entry
+
+    async def async_step_init(
+        self, user_input: dict | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+
+        current_interval = self._entry.options.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL_SECONDS)
+        current_url      = self._entry.data.get("url", DEFAULT_URL)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("url", default=current_url): str,
+                    vol.Required(CONF_SCAN_INTERVAL, default=current_interval): vol.All(
+                        int, vol.Range(min=10, max=300)
+                    ),
+                }
+            ),
         )
