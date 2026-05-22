@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="custom_components/gaggiuino_profiler/logo.png" alt="Gaggiuino Local Profiler" width="120"/>
+  <img src="logo.svg" alt="Gaggiuino Local Profiler" width="660"/>
 </p>
-
-<h1 align="center">Gaggiuino Local Profiler — Home Assistant Integration</h1>
 
 <p align="center">
   <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/releases">
