@@ -16,101 +16,101 @@
 </p>
 
 <p align="center">
-  Bindet den <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">Gaggiuino Local Profiler</a> als native HA-Entities ein —<br/>
-  Maschinenstatus, Shotdaten und Live-Brühstatus direkt in Home Assistant.
+  Exposes <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">Gaggiuino Local Profiler</a> as native Home Assistant entities —<br/>
+  machine status, shot data and live brewing state, all without cloud.
 </p>
 
 ---
 
-## ⚡ Schnellinstallation via HACS
+## ⚡ Quick Install
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=mxkissnr&repository=gaggiuino-profiler-integration&category=integration">
-  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Integration via HACS hinzufügen" height="40"/>
+  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Add Integration via HACS" height="40"/>
 </a>
 
 ---
 
-## ✨ Was diese Integration macht
+## ✨ Features
 
-| | Feature | Beschreibung |
+| | Feature | Description |
 |---|---|---|
-| ☕ | **Brühstatus** | Binary Sensor aktualisiert sich alle 2 Sekunden — ideal als Automations-Trigger |
-| 📊 | **14 Shot-Sensoren** | Profil, Score, Dauer, Druck, Yield, Ratio, Dose, Kaffee, Grinder u.v.m. |
-| 🔔 | **Shot-Event** | HA-Event `gaggiuino_profiler_shot_completed` mit allen Shotdaten nach jedem Bezug |
-| ⚙️ | **Konfigurierbar** | URL und Poll-Interval jederzeit über *Einstellungen → Integration → Konfigurieren* anpassbar |
-| 🔍 | **Diagnose** | HA-Diagnostics-Export für einfache Fehlerberichte |
+| ☕ | **Brewing Sensor** | Binary sensor updated every 2 seconds — perfect as automation trigger |
+| 📊 | **14 Shot Sensors** | Profile, score, duration, pressure, yield, ratio, dose, coffee, grinder and more |
+| 🔔 | **Shot Event** | Fires `gaggiuino_profiler_shot_completed` with full shot data after every pull |
+| ⚙️ | **Configurable** | URL and poll interval adjustable any time via *Settings → Integration → Configure* |
+| 🔍 | **Diagnostics** | HA diagnostics export for easy bug reports |
 
 ---
 
 ## 🚀 Installation
 
-### HACS (empfohlen)
+### HACS (recommended)
 
-1. Button oben klicken — oder: HACS → Integrationen → ⋮ → **Benutzerdefinierte Repositories**
-2. URL `https://github.com/mxkissnr/gaggiuino-profiler-integration` als **Integration** hinzufügen
-3. Nach *Gaggiuino Local Profiler* suchen und installieren
-4. Home Assistant neu starten
+1. Click the button above — or: HACS → Integrations → ⋮ → **Custom repositories**
+2. Add `https://github.com/mxkissnr/gaggiuino-profiler-integration` as **Integration**
+3. Search for *Gaggiuino Local Profiler* and install
+4. Restart Home Assistant
 
-### Manuell
+### Manual
 
-1. Den Ordner `custom_components/gaggiuino_profiler/` in das Verzeichnis `config/custom_components/` kopieren
-2. Home Assistant neu starten
+1. Copy `custom_components/gaggiuino_profiler/` into your `config/custom_components/` directory
+2. Restart Home Assistant
 
 ---
 
-## ⚙️ Einrichtung
+## ⚙️ Setup
 
-1. **Einstellungen → Geräte & Dienste → Integration hinzufügen**
-2. Nach *Gaggiuino Local Profiler* suchen
-3. URL des GLP-Add-ons eingeben, z. B.:
+1. **Settings → Devices & Services → Add Integration**
+2. Search for *Gaggiuino Local Profiler*
+3. Enter the URL of your GLP add-on, e.g.:
    ```
    http://homeassistant.local:8099
    ```
-   Die Integration testet die Verbindung direkt — bei Fehler erscheint eine Fehlermeldung.
+   The integration validates the connection immediately.
 
-### Optionen nach der Einrichtung anpassen
+### Options
 
-**Einstellungen → Geräte & Dienste → Gaggiuino Local Profiler → Konfigurieren**
+**Settings → Devices & Services → Gaggiuino Local Profiler → Configure**
 
-| Option | Standard | Beschreibung |
+| Option | Default | Description |
 |---|---|---|
-| URL | *(eingegebene URL)* | URL des GLP-Add-ons |
-| Poll-Interval | `60` | Aktualisierungsintervall in Sekunden (10–300) |
+| URL | *(entered URL)* | URL of the GLP add-on |
+| Poll interval | `60` | Update interval in seconds (10–300) |
 
 ---
 
 ## 📋 Entities
 
-### Sensoren
+### Sensors
 
-| Entity | Beschreibung | Einheit |
+| Entity | Description | Unit |
 |---|---|---|
 | Machine Status | `online` / `error` | — |
-| Shot Count | Gesamtzahl der gespeicherten Shots | shots |
-| Last Shot Profile | Name des Extraktionsprofils | — |
-| Last Shot Score | Automatischer 0–100-Score | — |
-| Last Shot Date | Zeitstempel des letzten Shots | — |
-| Last Shot Duration | Bezugsdauer | s |
-| Last Shot Avg Pressure | Durchschnittlicher Extraktionsdruck | bar |
-| Last Shot Yield | Ausbeute (Output-Gewicht) | g |
-| Last Shot Brew Ratio | Yield ÷ Dose | — |
-| Last Shot Dose | Einwaage (Input-Gewicht) | g |
-| Last Shot Coffee | Kaffee-Annotation | — |
-| Last Shot Grinder | Grinder-Annotation | — |
-| Last Sync | Zeitstempel der letzten Synchronisation | — |
-| Machine Hostname | Hostname des Gaggiuino-Controllers | — |
+| Shot Count | Total number of stored shots | shots |
+| Last Shot Profile | Extraction profile name | — |
+| Last Shot Score | Automatic 0–100 score | — |
+| Last Shot Date | Timestamp of the last shot | — |
+| Last Shot Duration | Shot duration | s |
+| Last Shot Avg Pressure | Average extraction pressure | bar |
+| Last Shot Yield | Output weight | g |
+| Last Shot Brew Ratio | Yield ÷ dose | — |
+| Last Shot Dose | Input dose weight | g |
+| Last Shot Coffee | Coffee annotation | — |
+| Last Shot Grinder | Grinder annotation | — |
+| Last Sync | Timestamp of last sync | — |
+| Machine Hostname | Gaggiuino controller hostname | — |
 
 ### Binary Sensor
 
-| Entity | Beschreibung | Aktualisierung |
+| Entity | Description | Update rate |
 |---|---|---|
-| Brewing | `true` während eines aktiven Bezugs | alle 2 Sekunden |
+| Brewing | `true` during an active pull | every 2 seconds |
 
 ---
 
-## 🔔 HA-Event: `gaggiuino_profiler_shot_completed`
+## 🔔 Event: `gaggiuino_profiler_shot_completed`
 
-Nach jedem abgeschlossenen Bezug feuert die Integration automatisch dieses Event. Es enthält alle relevanten Shotdaten:
+Fired automatically after every completed pull. Contains all relevant shot data:
 
 ```yaml
 event_type: gaggiuino_profiler_shot_completed
@@ -127,9 +127,9 @@ data:
   grinder: "DF64"
 ```
 
-### Automationsbeispiele
+### Automation examples
 
-**Benachrichtigung nach jedem Shot:**
+**Notification after each shot:**
 ```yaml
 automation:
   trigger:
@@ -138,14 +138,14 @@ automation:
   action:
     service: notify.mobile_app
     data:
-      title: "☕ Shot abgeschlossen"
+      title: "☕ Shot done"
       message: >
         {{ trigger.event.data.profile }} –
         {{ trigger.event.data.duration_s }}s,
-        Ratio 1:{{ trigger.event.data.ratio }}
+        ratio 1:{{ trigger.event.data.ratio }}
 ```
 
-**Licht nach Bezug dimmen:**
+**Dim lights when brewing ends:**
 ```yaml
 automation:
   trigger:
@@ -156,54 +156,41 @@ automation:
   action:
     service: light.turn_on
     target:
-      entity_id: light.kueche
+      entity_id: light.kitchen
     data:
       brightness_pct: 30
 ```
 
-**Shot in Google Sheets loggen (via Webhook):**
-```yaml
-automation:
-  trigger:
-    platform: event
-    event_type: gaggiuino_profiler_shot_completed
-  action:
-    service: rest_command.log_shot
-    data:
-      shot_id: "{{ trigger.event.data.shot_id }}"
-      profile: "{{ trigger.event.data.profile }}"
-      yield_g: "{{ trigger.event.data.yield_g }}"
-```
-
 ---
 
-## 🏗️ Architektur
+## 🏗️ Architecture
 
 ```
 Home Assistant
-├── GlpDataCoordinator  (60 s, konfigurierbar)
-│   ├── GET /api/status    → Maschinenstatus, shotCount, lastSync
-│   └── GET /shots.json    → Shotdaten, Annotationen, Datapoints
+├── GlpDataCoordinator  (60 s, configurable)
+│   ├── GET /api/status    → machine status, shotCount, lastSync
+│   └── GET /shots.json    → shot data, annotations, datapoints
 │
 ├── GlpLiveCoordinator  (2 s)
-│   └── GET /api/live/data → isLive (Brühstatus)
+│   └── GET /api/live/data → isLive (brewing state)
 │
 └── Event Bus
-    └── gaggiuino_profiler_shot_completed  (bei neuer shot_id)
+    └── gaggiuino_profiler_shot_completed  (on new shot_id)
 ```
 
 ---
 
-## 🔍 Diagnose
+## 🔍 Diagnostics
 
-Bei Problemen: **Einstellungen → Geräte & Dienste → Gaggiuino Local Profiler → Gerät → Diagnose herunterladen**
+**Settings → Devices & Services → Gaggiuino Local Profiler → Device → Download Diagnostics**
 
-Die Diagnosedatei enthält die aktuellen Coordinator-Daten (ohne sensible Informationen) und erleichtert das Melden von Issues.
+The diagnostics file contains current coordinator data (no sensitive information) and makes it easy to file an issue.
 
 ---
 
 <p align="center">
   <a href="CHANGELOG.md">📋 Changelog</a> ·
+  <a href="DOCS.de.md">📖 Dokumentation (DE)</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">🔧 GLP Add-on</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/issues">🐛 Issues</a>
 </p>
