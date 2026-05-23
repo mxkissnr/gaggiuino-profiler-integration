@@ -11,6 +11,7 @@
   </a>
   <img src="https://img.shields.io/badge/Home%20Assistant-2024.1%2B-41bdf5?logo=home-assistant&style=flat-square" alt="HA Version"/>
   <img src="https://img.shields.io/badge/Polling-local-6b7280?style=flat-square" alt="Local Polling"/>
+  <img src="https://img.shields.io/badge/Built%20with-Claude%20by%20Anthropic-D97706?style=flat-square" alt="Built with Claude"/>
 </p>
 
 <p align="center">
@@ -191,4 +192,8 @@ The diagnostics file contains current coordinator data (no sensitive information
   <a href="DOCS.de.md">📖 Dokumentation (DE)</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">🔧 GLP Add-on</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/issues">🐛 Issues</a>
+</p>
+
+<p align="center">
+  <sub>Built with AI assistance — designed and developed together with <a href="https://claude.ai">Claude</a> by Anthropic</sub>
 </p>
