@@ -44,6 +44,14 @@ SENSORS: tuple[GlpSensorDescription, ...] = (
         native_unit_of_measurement="shots",
     ),
     GlpSensorDescription(
+        key="shots_today",
+        data_key="shots_today",
+        name="Shots Today",
+        icon="mdi:coffee-maker-check-outline",
+        state_class=SensorStateClass.TOTAL,
+        native_unit_of_measurement="shots",
+    ),
+    GlpSensorDescription(
         key="last_shot_profile",
         data_key="last_shot_profile",
         name="Last Shot Profile",

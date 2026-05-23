@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0] – 2026-05-23
+### Added
+- `shots_today` sensor — counts how many shots were pulled today (HA-configured timezone); closes #2
+
 ## [1.1.0] – 2026-05-22
 ### Added
 - `is_brewing` binary sensor via fast (2 s) polling of `/api/live/data`

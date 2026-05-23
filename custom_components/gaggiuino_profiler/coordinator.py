@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, SCAN_INTERVAL_SECONDS
 
@@ -75,9 +76,18 @@ class GlpDataCoordinator(DataUpdateCoordinator):
 
         current_shot_id = last.get("id")
 
+        now_local  = dt_util.now()
+        today_date = now_local.date()
+        shots_today = sum(
+            1 for s in shots
+            if (ts := _parse_ts(s.get("timestamp"))) is not None
+            and ts.astimezone(now_local.tzinfo).date() == today_date
+        )
+
         data = {
             "machine_status":      "online" if not status.get("lastSyncError") else "error",
             "shot_count":          status.get("shotCount", 0),
+            "shots_today":         shots_today,
             "last_shot_id":        current_shot_id,
             "last_shot_profile":   last.get("profileName") or last.get("profile", {}).get("name"),
             "last_shot_score":     last.get("annotation", {}).get("score") if last else None,

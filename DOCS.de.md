@@ -46,6 +46,7 @@ Die Integration testet die Verbindung direkt beim Einrichten.
 |---|---|---|
 | Machine Status | `online` / `error` | — |
 | Shot Count | Gesamtzahl der gespeicherten Shots | shots |
+| Shots Today | Anzahl der heutigen Bezüge | shots |
 | Last Shot Profile | Name des Extraktionsprofils | — |
 | Last Shot Score | Automatischer 0–100-Score | — |
 | Last Shot Date | Zeitstempel des letzten Shots | — |

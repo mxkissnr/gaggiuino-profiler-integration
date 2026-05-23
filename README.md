@@ -34,7 +34,7 @@
 | | Feature | Description |
 |---|---|---|
 | ☕ | **Brewing Sensor** | Binary sensor updated every 2 seconds — perfect as automation trigger |
-| 📊 | **14 Shot Sensors** | Profile, score, duration, pressure, yield, ratio, dose, coffee, grinder and more |
+| 📊 | **15 Shot Sensors** | Profile, score, duration, pressure, yield, ratio, dose, coffee, grinder, shots today and more |
 | 🔔 | **Shot Event** | Fires `gaggiuino_profiler_shot_completed` with full shot data after every pull |
 | ⚙️ | **Configurable** | URL and poll interval adjustable any time via *Settings → Integration → Configure* |
 | 🔍 | **Diagnostics** | HA diagnostics export for easy bug reports |
@@ -86,6 +86,7 @@
 |---|---|---|
 | Machine Status | `online` / `error` | — |
 | Shot Count | Total number of stored shots | shots |
+| Shots Today | Number of shots pulled today | shots |
 | Last Shot Profile | Extraction profile name | — |
 | Last Shot Score | Automatic 0–100 score | — |
 | Last Shot Date | Timestamp of the last shot | — |
