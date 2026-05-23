@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.1] – 2026-05-23
+### Fixed
+- Default URL changed from `http://localhost:8099` to `http://homeassistant.local:8099` — localhost doesn't resolve from HA core to the add-on container; closes #3
+- Shot timestamps now parsed correctly — GLP uses Unix seconds; previous code divided by 1000 (assumed ms), causing all shot dates to appear as 1970; closes #3
+
 ## [1.2.0] – 2026-05-23
 ### Added
 - `shots_today` sensor — counts how many shots were pulled today (HA-configured timezone); closes #2

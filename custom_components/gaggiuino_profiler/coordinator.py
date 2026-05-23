@@ -16,8 +16,9 @@ def _parse_ts(value: object) -> datetime | None:
         return None
     try:
         if isinstance(value, (int, float)):
-            # Unix ms timestamp
-            return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
+            # GLP timestamps are Unix seconds; values > 1e10 are ms
+            ts = value / 1000 if value > 1e10 else value
+            return datetime.fromtimestamp(ts, tz=timezone.utc)
         s = str(value)
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
         if dt.tzinfo is None:
