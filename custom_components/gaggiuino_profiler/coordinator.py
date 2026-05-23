@@ -53,6 +53,13 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         except Exception as err:
             raise UpdateFailed(f"GLP unreachable: {err}") from err
 
+        try:
+            async with self._session.get(f"{self._url}/api/maintenance", timeout=aiohttp.ClientTimeout(total=10)) as r:
+                r.raise_for_status()
+                maintenance = await r.json()
+        except Exception:
+            maintenance = {}
+
         last = shots[-1] if shots else {}
         ann  = last.get("annotation") or {}
 
@@ -122,4 +129,8 @@ class GlpDataCoordinator(DataUpdateCoordinator):
             )
 
         self._last_shot_id = current_shot_id
+
+        for task in ("descaling", "backflush", "grouphead", "gaskets", "waterfilter"):
+            data[f"maint_{task}"] = maintenance.get(task) or {}
+
         return data

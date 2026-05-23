@@ -28,6 +28,11 @@ class GlpSensorDescription(SensorEntityDescription):
     data_key: str = ""
 
 
+@dataclass(frozen=True)
+class GlpMaintenanceSensorDescription(SensorEntityDescription):
+    task_key: str = ""
+
+
 SENSORS: tuple[GlpSensorDescription, ...] = (
     GlpSensorDescription(
         key="machine_status",
@@ -144,15 +149,49 @@ SENSORS: tuple[GlpSensorDescription, ...] = (
 )
 
 
+MAINTENANCE_SENSORS: tuple[GlpMaintenanceSensorDescription, ...] = (
+    GlpMaintenanceSensorDescription(
+        key="maint_descaling",
+        task_key="descaling",
+        name="Maintenance Descaling",
+        icon="mdi:water-alert-outline",
+    ),
+    GlpMaintenanceSensorDescription(
+        key="maint_backflush",
+        task_key="backflush",
+        name="Maintenance Backflush",
+        icon="mdi:coffee-maker-outline",
+    ),
+    GlpMaintenanceSensorDescription(
+        key="maint_grouphead",
+        task_key="grouphead",
+        name="Maintenance Group Head",
+        icon="mdi:wrench-outline",
+    ),
+    GlpMaintenanceSensorDescription(
+        key="maint_gaskets",
+        task_key="gaskets",
+        name="Maintenance Gaskets",
+        icon="mdi:circle-outline",
+    ),
+    GlpMaintenanceSensorDescription(
+        key="maint_waterfilter",
+        task_key="waterfilter",
+        name="Maintenance Water Filter",
+        icon="mdi:water-check-outline",
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
-    async_add_entities(
-        GlpSensor(coordinator, entry, description) for description in SENSORS
-    )
+    entities: list = [GlpSensor(coordinator, entry, d) for d in SENSORS]
+    entities += [GlpMaintenanceSensor(coordinator, entry, d) for d in MAINTENANCE_SENSORS]
+    async_add_entities(entities)
 
 
 class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
@@ -178,3 +217,41 @@ class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
     @property
     def native_value(self) -> Any:
         return self.coordinator.data.get(self.entity_description.data_key)
+
+
+class GlpMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: GlpDataCoordinator,
+        entry: ConfigEntry,
+        description: GlpMaintenanceSensorDescription,
+    ) -> None:
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Gaggiuino Local Profiler",
+            manufacturer="Gaggiuino",
+            model="Local Profiler",
+            configuration_url=entry.data["url"],
+        )
+
+    def _task_data(self) -> dict:
+        return self.coordinator.data.get(f"maint_{self.entity_description.task_key}") or {}
+
+    @property
+    def native_value(self) -> str | None:
+        return self._task_data().get("status") or None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        d = self._task_data()
+        return {
+            "days_since":   d.get("days_since"),
+            "shots_since":  d.get("shots_since"),
+            "last_date":    d.get("last_date"),
+            "pct":          d.get("pct"),
+        }
