@@ -101,6 +101,7 @@ class GlpDataCoordinator(DataUpdateCoordinator):
 
         data = {
             "machine_status":      "online" if not status.get("lastSyncError") else "error",
+            "switch_entity":       status.get("switchEntity") or None,
             "shot_count":          status.get("shotCount", 0),
             "shots_today":         shots_today,
             "last_shot_id":        current_shot_id,

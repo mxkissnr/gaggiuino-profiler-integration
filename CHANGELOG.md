@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.1] – 2026-05-24
+### Added
+- `machine_status` sensor now exposes `switch_entity` as a state attribute (sourced from GLP `/api/status`), allowing the Lovelace card to auto-detect the smart plug without manual config; closes #6
+
 ## [1.4.0] – 2026-05-24
 ### Added
 - Preheat sensors: `binary_sensor.…preheat_ready`, `sensor.…preheat_elapsed` (s), `sensor.…preheat_remaining` (s) — sourced from GLP `/api/preheat`; gracefully unavailable on older GLP versions; closes #5

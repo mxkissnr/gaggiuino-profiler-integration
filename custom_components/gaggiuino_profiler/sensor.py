@@ -236,6 +236,13 @@ class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
     def native_value(self) -> Any:
         return self.coordinator.data.get(self.entity_description.data_key)
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        if self.entity_description.key == "machine_status":
+            sw = self.coordinator.data.get("switch_entity")
+            return {"switch_entity": sw} if sw else {}
+        return {}
+
 
 class GlpMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
     _attr_has_entity_name = True
