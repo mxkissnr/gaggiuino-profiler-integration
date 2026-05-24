@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.2] – 2026-05-24
+### Fixed
+- Security: config flow now rejects non-http/https URLs before attempting a connection, preventing SSRF via schemes like `file://` or custom internal addresses; applies to both initial setup and options reconfigure
+
 ## [1.4.1] – 2026-05-24
 ### Added
 - `machine_status` sensor now exposes `switch_entity` as a state attribute (sourced from GLP `/api/status`), allowing the Lovelace card to auto-detect the smart plug without manual config; closes #6

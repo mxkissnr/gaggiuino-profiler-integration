@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import aiohttp
 import voluptuous as vol
+from urllib.parse import urlparse
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
@@ -20,22 +21,25 @@ class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             url = user_input["url"].rstrip("/")
-            try:
-                session = async_get_clientsession(self.hass)
-                async with session.get(
-                    f"{url}/api/status",
-                    timeout=aiohttp.ClientTimeout(total=10),
-                ) as r:
-                    r.raise_for_status()
-            except Exception:
-                errors["url"] = "cannot_connect"
+            if urlparse(url).scheme not in ("http", "https"):
+                errors["url"] = "invalid_url"
             else:
-                await self.async_set_unique_id(url)
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title=url.removeprefix("http://").removeprefix("https://"),
-                    data={"url": url},
-                )
+                try:
+                    session = async_get_clientsession(self.hass)
+                    async with session.get(
+                        f"{url}/api/status",
+                        timeout=aiohttp.ClientTimeout(total=10),
+                    ) as r:
+                        r.raise_for_status()
+                except Exception:
+                    errors["url"] = "cannot_connect"
+                else:
+                    await self.async_set_unique_id(url)
+                    self._abort_if_unique_id_configured()
+                    return self.async_create_entry(
+                        title=url.removeprefix("http://").removeprefix("https://"),
+                        data={"url": url},
+                    )
 
         return self.async_show_form(
             step_id="user",
@@ -58,14 +62,19 @@ class GlpOptionsFlow(OptionsFlow):
     async def async_step_init(
         self, user_input: dict | None = None
     ) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
+            if urlparse(user_input["url"].rstrip("/")).scheme not in ("http", "https"):
+                errors["url"] = "invalid_url"
+            else:
+                return self.async_create_entry(data=user_input)
 
         current_interval = self._entry.options.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL_SECONDS)
         current_url      = self._entry.data.get("url", DEFAULT_URL)
 
         return self.async_show_form(
             step_id="init",
+            errors=errors,
             data_schema=vol.Schema(
                 {
                     vol.Required("url", default=current_url): str,
