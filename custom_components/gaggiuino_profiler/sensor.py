@@ -146,6 +146,24 @@ SENSORS: tuple[GlpSensorDescription, ...] = (
         name="Machine Hostname",
         icon="mdi:lan",
     ),
+    GlpSensorDescription(
+        key="preheat_elapsed",
+        data_key="preheat_elapsed",
+        name="Preheat Elapsed",
+        icon="mdi:timer-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_display_precision=0,
+    ),
+    GlpSensorDescription(
+        key="preheat_remaining",
+        data_key="preheat_remaining",
+        name="Preheat Remaining",
+        icon="mdi:timer-sand",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_display_precision=0,
+    ),
 )
 
 

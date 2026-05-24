@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.0] – 2026-05-24
+### Added
+- Preheat sensors: `binary_sensor.…preheat_ready`, `sensor.…preheat_elapsed` (s), `sensor.…preheat_remaining` (s) — sourced from GLP `/api/preheat`; gracefully unavailable on older GLP versions; closes #5
+
 ## [1.3.0] – 2026-05-23
 ### Added
 - 5 maintenance sensors (Descaling, Backflush, Group Head, Gaskets, Water Filter) — state is `ok / soon / due / never`, attributes: `days_since`, `shots_since`, `last_date`, `pct`; data sourced from GLP `/api/maintenance`; gracefully unavailable on older GLP versions; closes #4

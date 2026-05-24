@@ -60,6 +60,13 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         except Exception:
             maintenance = {}
 
+        try:
+            async with self._session.get(f"{self._url}/api/preheat", timeout=aiohttp.ClientTimeout(total=10)) as r:
+                r.raise_for_status()
+                preheat = await r.json()
+        except Exception:
+            preheat = {}
+
         last = shots[-1] if shots else {}
         ann  = last.get("annotation") or {}
 
@@ -132,5 +139,9 @@ class GlpDataCoordinator(DataUpdateCoordinator):
 
         for task in ("descaling", "backflush", "grouphead", "gaskets", "waterfilter"):
             data[f"maint_{task}"] = maintenance.get(task) or {}
+
+        data["preheat_ready"]     = bool(preheat.get("ready"))
+        data["preheat_elapsed"]   = preheat.get("elapsed")
+        data["preheat_remaining"] = preheat.get("remaining")
 
         return data

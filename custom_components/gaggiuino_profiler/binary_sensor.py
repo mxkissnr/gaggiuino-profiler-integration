@@ -11,6 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
+from .coordinator import GlpDataCoordinator
 from .live_coordinator import GlpLiveCoordinator
 
 
@@ -20,7 +21,11 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     live_coordinator: GlpLiveCoordinator = hass.data[DOMAIN][entry.entry_id]["live"]
-    async_add_entities([IsBrewingSensor(live_coordinator, entry)])
+    data_coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
+    async_add_entities([
+        IsBrewingSensor(live_coordinator, entry),
+        PreheatReadySensor(data_coordinator, entry),
+    ])
 
 
 class IsBrewingSensor(CoordinatorEntity[GlpLiveCoordinator], BinarySensorEntity):
@@ -45,3 +50,26 @@ class IsBrewingSensor(CoordinatorEntity[GlpLiveCoordinator], BinarySensorEntity)
         if self.coordinator.data is None:
             return None
         return bool(self.coordinator.data.get("isLive"))
+
+
+class PreheatReadySensor(CoordinatorEntity[GlpDataCoordinator], BinarySensorEntity):
+    _attr_has_entity_name = True
+    _attr_name = "Preheat Ready"
+    _attr_icon = "mdi:coffee-maker-check"
+
+    def __init__(self, coordinator: GlpDataCoordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{entry.entry_id}_preheat_ready"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Gaggiuino Local Profiler",
+            manufacturer="Gaggiuino",
+            model="Local Profiler",
+            configuration_url=entry.data["url"],
+        )
+
+    @property
+    def is_on(self) -> bool | None:
+        if self.coordinator.data is None:
+            return None
+        return bool(self.coordinator.data.get("preheat_ready"))
