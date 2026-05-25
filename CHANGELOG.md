@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.1] – 2026-05-25
+### Changed
+- API token is now fully automatic — fetched from GLP `/api/status` on every coordinator update, no user input required; `api_token` config field removed; closes #9
+
 ## [1.5.0] – 2026-05-25
 ### Added
 - Optional API token support: new `api_token` field in setup and options flow; if set, all requests to GLP include the `X-GLP-Token` header; closes #8

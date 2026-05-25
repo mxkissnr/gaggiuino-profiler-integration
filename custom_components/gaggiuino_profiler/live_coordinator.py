@@ -11,22 +11,22 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GlpLiveCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str, api_token: str = ""):
+    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str, data_coordinator):
         super().__init__(
             hass,
             _LOGGER,
             name=f"{DOMAIN}_live",
             update_interval=timedelta(seconds=LIVE_INTERVAL_SECONDS),
         )
-        self._session = session
-        self._url     = url.rstrip("/")
-        self._headers = {"X-GLP-Token": api_token} if api_token else {}
+        self._session          = session
+        self._url              = url.rstrip("/")
+        self._data_coordinator = data_coordinator
 
     async def _async_update_data(self) -> dict:
         try:
             async with self._session.get(
                 f"{self._url}/api/live/data",
-                headers=self._headers,
+                headers=self._data_coordinator._headers,
                 timeout=aiohttp.ClientTimeout(total=5),
             ) as r:
                 r.raise_for_status()

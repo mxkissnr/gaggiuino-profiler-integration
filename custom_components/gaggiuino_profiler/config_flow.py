@@ -8,7 +8,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import CONF_API_TOKEN, CONF_SCAN_INTERVAL, DEFAULT_URL, DOMAIN, SCAN_INTERVAL_SECONDS
+from .const import CONF_SCAN_INTERVAL, DEFAULT_URL, DOMAIN, SCAN_INTERVAL_SECONDS
 
 
 class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -20,17 +20,14 @@ class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            url   = user_input["url"].rstrip("/")
-            token = user_input.get(CONF_API_TOKEN, "").strip()
+            url = user_input["url"].rstrip("/")
             if urlparse(url).scheme not in ("http", "https"):
                 errors["url"] = "invalid_url"
             else:
                 try:
                     session = async_get_clientsession(self.hass)
-                    headers = {"X-GLP-Token": token} if token else {}
                     async with session.get(
                         f"{url}/api/status",
-                        headers=headers,
                         timeout=aiohttp.ClientTimeout(total=10),
                     ) as r:
                         r.raise_for_status()
@@ -41,15 +38,12 @@ class GlpConfigFlow(ConfigFlow, domain=DOMAIN):
                     self._abort_if_unique_id_configured()
                     return self.async_create_entry(
                         title=url.removeprefix("http://").removeprefix("https://"),
-                        data={"url": url, CONF_API_TOKEN: token},
+                        data={"url": url},
                     )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required("url", default=DEFAULT_URL): str,
-                vol.Optional(CONF_API_TOKEN, default=""): str,
-            }),
+            data_schema=vol.Schema({vol.Required("url", default=DEFAULT_URL): str}),
             errors=errors,
         )
 
@@ -74,8 +68,7 @@ class GlpOptionsFlow(OptionsFlow):
                 return self.async_create_entry(data=user_input)
 
         current_interval = self._entry.options.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL_SECONDS)
-        current_url      = self._entry.options.get("url", self._entry.data.get("url", DEFAULT_URL))
-        current_token    = self._entry.options.get(CONF_API_TOKEN, self._entry.data.get(CONF_API_TOKEN, ""))
+        current_url      = self._entry.data.get("url", DEFAULT_URL)
 
         return self.async_show_form(
             step_id="init",
@@ -85,6 +78,5 @@ class GlpOptionsFlow(OptionsFlow):
                 vol.Required(CONF_SCAN_INTERVAL, default=current_interval): vol.All(
                     int, vol.Range(min=10, max=300)
                 ),
-                vol.Optional(CONF_API_TOKEN, default=current_token): str,
             }),
         )

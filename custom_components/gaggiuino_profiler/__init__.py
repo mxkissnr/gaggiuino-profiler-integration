@@ -2,7 +2,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import CONF_API_TOKEN, CONF_SCAN_INTERVAL, DOMAIN, SCAN_INTERVAL_SECONDS
+from .const import CONF_SCAN_INTERVAL, DOMAIN, SCAN_INTERVAL_SECONDS
 from .coordinator import GlpDataCoordinator
 from .live_coordinator import GlpLiveCoordinator
 
@@ -14,11 +14,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     url           = entry.data["url"]
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL_SECONDS)
 
-    api_token        = entry.options.get(CONF_API_TOKEN, entry.data.get(CONF_API_TOKEN, ""))
-    coordinator      = GlpDataCoordinator(hass, session, url, scan_interval, api_token)
-    live_coordinator = GlpLiveCoordinator(hass, session, url, api_token)
-
+    coordinator      = GlpDataCoordinator(hass, session, url, scan_interval)
     await coordinator.async_config_entry_first_refresh()
+    live_coordinator = GlpLiveCoordinator(hass, session, url, coordinator)
     await live_coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {

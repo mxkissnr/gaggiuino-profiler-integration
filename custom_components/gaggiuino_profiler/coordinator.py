@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
-from .const import CONF_API_TOKEN, DOMAIN, SCAN_INTERVAL_SECONDS
+from .const import DOMAIN, SCAN_INTERVAL_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def _parse_ts(value: object) -> datetime | None:
 
 
 class GlpDataCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str, scan_interval: int = SCAN_INTERVAL_SECONDS, api_token: str = ""):
+    def __init__(self, hass: HomeAssistant, session: aiohttp.ClientSession, url: str, scan_interval: int = SCAN_INTERVAL_SECONDS):
         super().__init__(
             hass,
             _LOGGER,
@@ -38,14 +38,18 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         )
         self._session = session
         self._url     = url.rstrip("/")
-        self._headers = {"X-GLP-Token": api_token} if api_token else {}
+        self._headers: dict = {}
         self._last_shot_id: int | None = None
 
     async def _async_update_data(self) -> dict:
         try:
-            async with self._session.get(f"{self._url}/api/status", headers=self._headers, timeout=aiohttp.ClientTimeout(total=10)) as r:
+            async with self._session.get(f"{self._url}/api/status", timeout=aiohttp.ClientTimeout(total=10)) as r:
                 r.raise_for_status()
                 status = await r.json()
+
+            # Auto-fetch token from status (no auth required for /api/status)
+            if token := status.get("apiToken"):
+                self._headers = {"X-GLP-Token": token}
 
             async with self._session.get(f"{self._url}/shots.json", headers=self._headers, timeout=aiohttp.ClientTimeout(total=10)) as r:
                 r.raise_for_status()
