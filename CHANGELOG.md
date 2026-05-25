@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.0] – 2026-05-25
+### Added
+- New `Maintenance Grinders` sensor — aggregates all grinder cleaning entries from GLP v1.40.0 into a single worst-status sensor; per-grinder status, days_since, shots_since, last_date, and pct are exposed as state attributes keyed by grinder name; closes #10
+
 ## [1.5.1] – 2026-05-25
 ### Changed
 - API token is now fully automatic — fetched from GLP `/api/status` on every coordinator update, no user input required; `api_token` config field removed; closes #9

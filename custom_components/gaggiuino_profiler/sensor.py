@@ -209,6 +209,7 @@ async def async_setup_entry(
     coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
     entities: list = [GlpSensor(coordinator, entry, d) for d in SENSORS]
     entities += [GlpMaintenanceSensor(coordinator, entry, d) for d in MAINTENANCE_SENSORS]
+    entities.append(GlpGrinderMaintenanceSensor(coordinator, entry))
     async_add_entities(entities)
 
 
@@ -242,6 +243,31 @@ class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
             sw = self.coordinator.data.get("switch_entity")
             return {"switch_entity": sw} if sw else {}
         return {}
+
+
+class GlpGrinderMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
+    _attr_has_entity_name = True
+    _attr_name = "Maintenance Grinders"
+    _attr_icon = "mdi:coffee-maker-outline"
+
+    def __init__(self, coordinator: GlpDataCoordinator, entry: ConfigEntry) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{entry.entry_id}_maint_grinders"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Gaggiuino Local Profiler",
+            manufacturer="Gaggiuino",
+            model="Local Profiler",
+            configuration_url=entry.data["url"],
+        )
+
+    @property
+    def native_value(self) -> str | None:
+        return self.coordinator.data.get("grinder_maintenance_status")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return self.coordinator.data.get("grinder_maintenance_details") or {}
 
 
 class GlpMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):

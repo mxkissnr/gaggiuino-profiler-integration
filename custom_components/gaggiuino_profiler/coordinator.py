@@ -146,6 +146,30 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         for task in ("descaling", "backflush", "grouphead", "gaskets", "waterfilter"):
             data[f"maint_{task}"] = maintenance.get(task) or {}
 
+        # Aggregate grinder_* maintenance entries into a single worst-status sensor
+        _STATUS_RANK = {"due": 3, "never": 2, "soon": 1, "ok": 0}
+        grinder_details: dict[str, dict] = {
+            k: v for k, v in maintenance.items() if k.startswith("grinder_")
+        }
+        worst = max(
+            (_STATUS_RANK.get(v.get("status", "ok"), 0) for v in grinder_details.values()),
+            default=-1,
+        )
+        data["grinder_maintenance_status"] = (
+            next(s for s, r in _STATUS_RANK.items() if r == worst)
+            if worst >= 0 else None
+        )
+        data["grinder_maintenance_details"] = {
+            v.get("grinderName", k): {
+                "status":        v.get("status"),
+                "days_since":    v.get("daysSince"),
+                "shots_since":   v.get("shotsSince"),
+                "last_date":     v.get("lastDate"),
+                "pct":           v.get("pct"),
+            }
+            for k, v in grinder_details.items()
+        }
+
         data["preheat_ready"]     = bool(preheat.get("ready"))
         data["preheat_elapsed"]   = preheat.get("elapsed")
         data["preheat_remaining"] = preheat.get("remaining")
