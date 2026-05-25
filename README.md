@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/releases">
-    <img src="https://img.shields.io/github/v/tag/mxkissnr/gaggiuino-profiler-integration?color=%23f59e0b&label=Version&style=flat-square" alt="Version"/>
+  <a href="https://github.com/mxkissnr/glp-integration/releases">
+    <img src="https://img.shields.io/github/v/tag/mxkissnr/glp-integration?color=%23f59e0b&label=Version&style=flat-square" alt="Version"/>
   </a>
   <a href="https://github.com/custom-components/hacs">
     <img src="https://img.shields.io/badge/HACS-Custom-orange?style=flat-square" alt="HACS Custom"/>
@@ -24,7 +24,7 @@
 
 ## ⚡ Quick Install
 
-<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=mxkissnr&repository=gaggiuino-profiler-integration&category=integration">
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=mxkissnr&repository=glp-integration&category=integration">
   <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Add Integration via HACS" height="40"/>
 </a>
 
@@ -47,7 +47,7 @@
 ### HACS (recommended)
 
 1. Click the button above — or: HACS → Integrations → ⋮ → **Custom repositories**
-2. Add `https://github.com/mxkissnr/gaggiuino-profiler-integration` as **Integration**
+2. Add `https://github.com/mxkissnr/glp-integration` as **Integration**
 3. Search for *Gaggiuino Local Profiler* and install
 4. Restart Home Assistant
 
@@ -193,7 +193,7 @@ The diagnostics file contains current coordinator data (no sensitive information
   <a href="https://github.com/mxkissnr/gaggiuino-local-profiler/wiki">📖 Documentation (Wiki)</a> ·
   <a href="CHANGELOG.md">📋 Changelog</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">🔧 GLP Add-on</a> ·
-  <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/issues">🐛 Issues</a>
+  <a href="https://github.com/mxkissnr/glp-integration/issues">🐛 Issues</a>
 </p>
 
 ---
