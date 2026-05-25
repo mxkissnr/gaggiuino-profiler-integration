@@ -5,7 +5,11 @@
         "title": "Connect to Gaggiuino Local Profiler",
         "description": "Enter the URL of your Gaggiuino Local Profiler instance (e.g. http://homeassistant.local:8099).",
         "data": {
-          "url": "GLP URL"
+          "url": "GLP URL",
+          "api_token": "API Token (optional)"
+        },
+        "data_description": {
+          "api_token": "Leave empty if no API token is configured in the add-on options."
         }
       }
     },
@@ -22,7 +26,8 @@
         "title": "Gaggiuino Local Profiler Options",
         "data": {
           "url": "GLP URL",
-          "scan_interval": "Poll interval (seconds)"
+          "scan_interval": "Poll interval (seconds)",
+          "api_token": "API Token (optional)"
         }
       }
     }

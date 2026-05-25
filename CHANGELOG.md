@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.0] – 2026-05-25
+### Added
+- Optional API token support: new `api_token` field in setup and options flow; if set, all requests to GLP include the `X-GLP-Token` header; closes #8
+
 ## [1.4.2] – 2026-05-24
 ### Fixed
 - Security: config flow now rejects non-http/https URLs before attempting a connection, preventing SSRF via schemes like `file://` or custom internal addresses; applies to both initial setup and options reconfigure
