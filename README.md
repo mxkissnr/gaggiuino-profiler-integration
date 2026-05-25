@@ -189,8 +189,8 @@ The diagnostics file contains current coordinator data (no sensitive information
 ---
 
 <p align="center">
+  <a href="https://github.com/mxkissnr/gaggiuino-local-profiler/wiki">📖 Documentation (Wiki)</a> ·
   <a href="CHANGELOG.md">📋 Changelog</a> ·
-  <a href="DOCS.de.md">📖 Dokumentation (DE)</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-local-profiler">🔧 GLP Add-on</a> ·
   <a href="https://github.com/mxkissnr/gaggiuino-profiler-integration/issues">🐛 Issues</a>
 </p>
