@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.1] – 2026-05-26
+### Fixed
+- `GlpOrdersSubView` now proxies `DELETE` requests — required for per-entry history deletion and "clear all history" from the GLP Order Card; closes #14
+
 ## [1.8.0] – 2026-05-26
 ### Added
 - `machine_temperature` and `machine_target_temperature` sensors — read from `/api/preheat` (`temp` and `targetTemp` fields); device class `temperature`, unit °C, state class `measurement`; requires GLP add-on v1.51.0+; closes #12

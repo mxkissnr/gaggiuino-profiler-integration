@@ -68,6 +68,9 @@ class GlpOrdersSubView(HomeAssistantView):
     async def post(self, request: Request, rest: str) -> Response:
         return await _proxy(request, "POST", f"api/orders/{rest}")
 
+    async def delete(self, request: Request, rest: str) -> Response:
+        return await _proxy(request, "DELETE", f"api/orders/{rest}")
+
 
 class GlpShotsSubView(HomeAssistantView):
     """Proxy for /api/glp/shots/{rest} → add-on /api/shots/{rest}."""
