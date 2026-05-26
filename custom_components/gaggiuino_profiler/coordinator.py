@@ -170,8 +170,10 @@ class GlpDataCoordinator(DataUpdateCoordinator):
             for k, v in grinder_details.items()
         }
 
-        data["preheat_ready"]     = bool(preheat.get("ready"))
-        data["preheat_elapsed"]   = preheat.get("elapsed")
-        data["preheat_remaining"] = preheat.get("remaining")
+        data["preheat_ready"]              = bool(preheat.get("ready"))
+        data["preheat_elapsed"]            = preheat.get("elapsed")
+        data["preheat_remaining"]          = preheat.get("remaining")
+        data["machine_temperature"]        = preheat.get("temp")
+        data["machine_target_temperature"] = preheat.get("targetTemp")
 
         return data

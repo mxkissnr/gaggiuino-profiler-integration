@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.0] – 2026-05-26
+### Added
+- `machine_temperature` and `machine_target_temperature` sensors — read from `/api/preheat` (`temp` and `targetTemp` fields); device class `temperature`, unit °C, state class `measurement`; requires GLP add-on v1.51.0+; closes #12
+
 ## [1.7.0] – 2026-05-26
 ### Added
 - REST API proxy views at `/api/glp/orders/*` and `/api/glp/shots/*` — the integration now registers three `HomeAssistantView` endpoints that forward requests to the GLP add-on using the coordinator's URL and API token; allows the GLP Order Card to access the orders API via `hass.fetchWithAuth` without requiring a Supervisor ingress session; closes #13

@@ -12,6 +12,7 @@ from homeassistant.components.sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     UnitOfPressure,
+    UnitOfTemperature,
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant
@@ -145,6 +146,26 @@ SENSORS: tuple[GlpSensorDescription, ...] = (
         data_key="machine_url",
         name="Machine Hostname",
         icon="mdi:lan",
+    ),
+    GlpSensorDescription(
+        key="machine_temperature",
+        data_key="machine_temperature",
+        name="Machine Temperature",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+    ),
+    GlpSensorDescription(
+        key="machine_target_temperature",
+        data_key="machine_target_temperature",
+        name="Machine Target Temperature",
+        icon="mdi:thermometer-chevron-up",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
     ),
     GlpSensorDescription(
         key="preheat_elapsed",
