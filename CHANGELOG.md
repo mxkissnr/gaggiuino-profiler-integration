@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.8.2] – 2026-05-26
+### Security
+- Proxy functions now forward the authenticated HA user ID as `X-GLP-HA-User-ID` header — the add-on (v1.54.0+) prefers this header over the client-supplied body field to prevent customer impersonation in the orders system; closes #15
+
 ## [1.8.1] – 2026-05-26
 ### Fixed
 - `GlpOrdersSubView` now proxies `DELETE` requests — required for per-entry history deletion and "clear all history" from the GLP Order Card; closes #14

@@ -32,8 +32,11 @@ async def _proxy(request: Request, method: str, addon_path: str) -> Response:
         url += f"?{request.query_string}"
 
     headers = dict(c._headers)
+    hass_user = request.get("hass_user")
+    if hass_user:
+        headers["X-GLP-HA-User-ID"] = str(hass_user.id)
     data = None
-    if method == "POST":
+    if method in ("POST", "PUT"):
         data = await request.read()
         headers["Content-Type"] = request.headers.get("Content-Type", "application/json")
 
