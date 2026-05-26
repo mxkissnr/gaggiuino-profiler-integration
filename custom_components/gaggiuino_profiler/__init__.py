@@ -5,11 +5,19 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import CONF_SCAN_INTERVAL, DOMAIN, SCAN_INTERVAL_SECONDS
 from .coordinator import GlpDataCoordinator
 from .live_coordinator import GlpLiveCoordinator
+from .orders_api import GlpOrdersSubView, GlpOrdersView, GlpShotsSubView
 
 PLATFORMS = ["sensor", "binary_sensor"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    # Register proxy views once (idempotent across multiple config entries)
+    if not hass.data.get(f"{DOMAIN}_views_registered"):
+        hass.http.register_view(GlpOrdersView())
+        hass.http.register_view(GlpOrdersSubView())
+        hass.http.register_view(GlpShotsSubView())
+        hass.data[f"{DOMAIN}_views_registered"] = True
+
     session       = async_get_clientsession(hass)
     url           = entry.data["url"]
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, SCAN_INTERVAL_SECONDS)
