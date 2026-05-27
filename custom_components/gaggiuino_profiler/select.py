@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import GlpDataCoordinator
+from .machine_coordinator import GlpMachineCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,15 +24,17 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
-    async_add_entities([GlpProfileSelect(coordinator, entry)])
+    coordinator: GlpDataCoordinator           = hass.data[DOMAIN][entry.entry_id]["data"]
+    machine_coordinator: GlpMachineCoordinator = hass.data[DOMAIN][entry.entry_id]["machine"]
+    async_add_entities([GlpProfileSelect(coordinator, machine_coordinator, entry)])
 
 
 class GlpProfileSelect(CoordinatorEntity[GlpDataCoordinator], SelectEntity):
     """Gaggiuino brew profile selector.
 
-    Reads available profiles and the current selection from the GLP add-on
-    (/api/machine/profiles), which in turn calls the Gaggiuino machine directly.
+    Profile options list comes from the main coordinator (60 s) — profiles
+    rarely change. The current selection is read from the machine coordinator
+    (5 s) so profile switches on the machine itself are reflected quickly.
     Writing a new profile calls /api/machine/profile/set on the add-on.
     """
 
@@ -39,8 +42,14 @@ class GlpProfileSelect(CoordinatorEntity[GlpDataCoordinator], SelectEntity):
     _attr_name = "Profile"
     _attr_icon = "mdi:coffee"
 
-    def __init__(self, coordinator: GlpDataCoordinator, entry: ConfigEntry) -> None:
+    def __init__(
+        self,
+        coordinator: GlpDataCoordinator,
+        machine_coordinator: GlpMachineCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
         super().__init__(coordinator)
+        self._machine_coordinator = machine_coordinator
         self._attr_unique_id = f"{entry.entry_id}_profile"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
@@ -53,10 +62,14 @@ class GlpProfileSelect(CoordinatorEntity[GlpDataCoordinator], SelectEntity):
 
     @property
     def options(self) -> list[str]:
+        # Full profile list from main coordinator (60 s — rarely changes)
         return self.coordinator.data.get("profile_options") or []
 
     @property
     def current_option(self) -> str | None:
+        # Live profile name from machine coordinator (5 s)
+        if self._machine_coordinator.data:
+            return self._machine_coordinator.data.get("profileName")
         return self.coordinator.data.get("current_profile")
 
     @property

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.9.1] – 2026-05-27
+### Fixed
+- Profile select `current_option` now reads from the machine coordinator (5 s refresh) instead of the main coordinator (60 s); profile changes made on the machine itself are reflected in HA within 5 s instead of up to 60 s; closes #17
+
 ## [1.9.0] – 2026-05-27
 ### Added
 - **Profile selector** (`select.gaggiuino_profiler_profile`) — reads available profiles and current selection from the Gaggiuino machine via the GLP add-on proxy (`GET /api/machine/profiles`); writing a new profile calls `POST /api/machine/profile/set`; no dependency on ALERTua/hass-gaggiuino required; closes #16
