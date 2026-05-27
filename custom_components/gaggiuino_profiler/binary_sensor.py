@@ -27,7 +27,6 @@ async def async_setup_entry(
     async_add_entities([
         IsBrewingSensor(live_coordinator, entry),
         PreheatReadySensor(data_coordinator, entry),
-        BrewSwitchSensor(machine_coordinator, entry),
         SteamSwitchSensor(machine_coordinator, entry),
     ])
 
@@ -77,36 +76,6 @@ class PreheatReadySensor(CoordinatorEntity[GlpDataCoordinator], BinarySensorEnti
         if self.coordinator.data is None:
             return None
         return bool(self.coordinator.data.get("preheat_ready"))
-
-
-class BrewSwitchSensor(CoordinatorEntity[GlpMachineCoordinator], BinarySensorEntity):
-    """Physical brew switch state from the Gaggiuino machine."""
-
-    _attr_has_entity_name = True
-    _attr_name = "Brew Switch"
-    _attr_device_class = BinarySensorDeviceClass.RUNNING
-    _attr_icon = "mdi:coffee"
-
-    def __init__(self, coordinator: GlpMachineCoordinator, entry: ConfigEntry) -> None:
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{entry.entry_id}_brew_switch"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name="Gaggiuino Local Profiler",
-            manufacturer="Gaggiuino",
-            model="Local Profiler",
-            configuration_url=entry.data["url"],
-        )
-
-    @property
-    def available(self) -> bool:
-        return bool(self.coordinator.data)
-
-    @property
-    def is_on(self) -> bool | None:
-        if not self.coordinator.data:
-            return None
-        return bool(self.coordinator.data.get("brewSwitchState"))
 
 
 class SteamSwitchSensor(CoordinatorEntity[GlpMachineCoordinator], BinarySensorEntity):

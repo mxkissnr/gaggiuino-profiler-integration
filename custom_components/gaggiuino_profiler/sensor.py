@@ -231,26 +231,9 @@ class GlpMachineSensorDescription(SensorEntityDescription):
 
 
 MACHINE_SENSORS: tuple[GlpMachineSensorDescription, ...] = (
-    GlpMachineSensorDescription(
-        key="machine_live_temperature",
-        data_key="temperature",
-        name="Machine Live Temperature",
-        icon="mdi:thermometer",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        suggested_display_precision=1,
-    ),
-    GlpMachineSensorDescription(
-        key="machine_target_temperature_live",
-        data_key="targetTemperature",
-        name="Machine Target Temperature Live",
-        icon="mdi:thermometer-chevron-up",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        suggested_display_precision=1,
-    ),
+    # Note: machine_temperature and machine_target_temperature already exist in
+    # the main coordinator (from /api/preheat). Only unique machine-coordinator
+    # sensors are defined here to avoid duplicate entities.
     GlpMachineSensorDescription(
         key="machine_live_pressure",
         data_key="pressure",

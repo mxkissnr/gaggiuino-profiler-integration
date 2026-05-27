@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.2] – 2026-05-27
+### Fixed
+- Removed duplicate temperature sensors: `machine_live_temperature` and `machine_target_temperature_live` duplicated the existing `machine_temperature` / `machine_target_temperature` from the main coordinator; closes #18
+- Removed `brew_switch` binary sensor — identical in practice to the existing `brewing` sensor; `steam_switch` kept as it has no equivalent; closes #18
+
 ## [1.9.1] – 2026-05-27
 ### Fixed
 - Profile select `current_option` now reads from the machine coordinator (5 s refresh) instead of the main coordinator (60 s); profile changes made on the machine itself are reflected in HA within 5 s instead of up to 60 s; closes #17
