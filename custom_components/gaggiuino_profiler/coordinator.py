@@ -72,6 +72,13 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         except Exception:
             preheat = {}
 
+        try:
+            async with self._session.get(f"{self._url}/api/machine/profiles", headers=self._headers, timeout=aiohttp.ClientTimeout(total=10)) as r:
+                r.raise_for_status()
+                profiles_data = await r.json()
+        except Exception:
+            profiles_data = {}
+
         last = shots[-1] if shots else {}
         ann  = last.get("annotation") or {}
 
@@ -175,5 +182,10 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         data["preheat_remaining"]          = preheat.get("remaining")
         data["machine_temperature"]        = preheat.get("temp")
         data["machine_target_temperature"] = preheat.get("targetTemp")
+
+        # Profile selector data
+        data["profile_options"]  = profiles_data.get("options") or []
+        data["current_profile"]  = profiles_data.get("current")
+        data["profile_options_raw"] = profiles_data.get("optionsRaw") or []
 
         return data

@@ -20,8 +20,11 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from homeassistant.const import PERCENTAGE
+
 from .const import DOMAIN
 from .coordinator import GlpDataCoordinator
+from .machine_coordinator import GlpMachineCoordinator
 
 
 @dataclass(frozen=True)
@@ -222,15 +225,90 @@ MAINTENANCE_SENSORS: tuple[GlpMaintenanceSensorDescription, ...] = (
 )
 
 
+@dataclass(frozen=True)
+class GlpMachineSensorDescription(SensorEntityDescription):
+    data_key: str = ""
+
+
+MACHINE_SENSORS: tuple[GlpMachineSensorDescription, ...] = (
+    GlpMachineSensorDescription(
+        key="machine_live_temperature",
+        data_key="temperature",
+        name="Machine Live Temperature",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_target_temperature_live",
+        data_key="targetTemperature",
+        name="Machine Target Temperature Live",
+        icon="mdi:thermometer-chevron-up",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_live_pressure",
+        data_key="pressure",
+        name="Machine Live Pressure",
+        icon="mdi:gauge",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.BAR,
+        suggested_display_precision=2,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_water_level",
+        data_key="waterLevel",
+        name="Machine Water Level",
+        icon="mdi:water-outline",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        suggested_display_precision=0,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_live_weight",
+        data_key="weight",
+        name="Machine Live Weight",
+        icon="mdi:scale",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="g",
+        suggested_display_precision=1,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_uptime",
+        data_key="upTime",
+        name="Machine Uptime",
+        icon="mdi:timer-outline",
+        device_class=SensorDeviceClass.DURATION,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        suggested_display_precision=0,
+    ),
+    GlpMachineSensorDescription(
+        key="machine_live_profile",
+        data_key="profileName",
+        name="Machine Active Profile",
+        icon="mdi:chart-bell-curve",
+    ),
+)
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    coordinator: GlpDataCoordinator = hass.data[DOMAIN][entry.entry_id]["data"]
+    coordinator: GlpDataCoordinator         = hass.data[DOMAIN][entry.entry_id]["data"]
+    machine_coordinator: GlpMachineCoordinator = hass.data[DOMAIN][entry.entry_id]["machine"]
     entities: list = [GlpSensor(coordinator, entry, d) for d in SENSORS]
     entities += [GlpMaintenanceSensor(coordinator, entry, d) for d in MAINTENANCE_SENSORS]
     entities.append(GlpGrinderMaintenanceSensor(coordinator, entry))
+    entities += [GlpMachineSensor(machine_coordinator, entry, d) for d in MACHINE_SENSORS]
     async_add_entities(entities)
 
 
@@ -327,3 +405,36 @@ class GlpMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
             "last_date":    d.get("last_date"),
             "pct":          d.get("pct"),
         }
+
+
+class GlpMachineSensor(CoordinatorEntity[GlpMachineCoordinator], SensorEntity):
+    """Live sensor sourced from the Gaggiuino machine via GLP add-on proxy."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: GlpMachineCoordinator,
+        entry: ConfigEntry,
+        description: GlpMachineSensorDescription,
+    ) -> None:
+        super().__init__(coordinator)
+        self.entity_description = description
+        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Gaggiuino Local Profiler",
+            manufacturer="Gaggiuino",
+            model="Local Profiler",
+            configuration_url=entry.data["url"],
+        )
+
+    @property
+    def available(self) -> bool:
+        return bool(self.coordinator.data)
+
+    @property
+    def native_value(self) -> Any:
+        if not self.coordinator.data:
+            return None
+        return self.coordinator.data.get(self.entity_description.data_key)

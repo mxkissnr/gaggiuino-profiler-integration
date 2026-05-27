@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0] – 2026-05-27
+### Added
+- **Profile selector** (`select.gaggiuino_profiler_profile`) — reads available profiles and current selection from the Gaggiuino machine via the GLP add-on proxy (`GET /api/machine/profiles`); writing a new profile calls `POST /api/machine/profile/set`; no dependency on ALERTua/hass-gaggiuino required; closes #16
+- **Machine live coordinator** (`GlpMachineCoordinator`) — polls `/api/machine/status` every 5 s for real-time machine data
+- **Machine live sensors**: `Machine Live Temperature`, `Machine Target Temperature Live`, `Machine Live Pressure`, `Machine Water Level`, `Machine Live Weight`, `Machine Uptime`, `Machine Active Profile`
+- **Machine binary sensors**: `Brew Switch` (physical brew switch state), `Steam Switch` (physical steam switch state)
+- `select` platform added to `PLATFORMS`
+
 ## [1.8.2] – 2026-05-26
 ### Security
 - Proxy functions now forward the authenticated HA user ID as `X-GLP-HA-User-ID` header — the add-on (v1.54.0+) prefers this header over the client-supplied body field to prevent customer impersonation in the orders system; closes #15
