@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.9.5] – 2026-05-27
+### Fixed
+- Each `recent_shots` entry now includes a `dp` field with downsampled pressure (`p`), temperature (`t`) and weight (`w`) curves (max 40 points per series, ×10 integers) so the Lovelace card can render a shot chart for every historical shot without additional API calls; closes #22
+
 ## [1.9.4] – 2026-05-27
 ### Added
 - `sensor.*_machine_status` now exposes a `recent_shots` attribute — a compact list of the last 10 shots (id, ts, profile, coffee, duration, yield_g, ratio, pressure, rating) for use by the Lovelace card's shot-navigation feature

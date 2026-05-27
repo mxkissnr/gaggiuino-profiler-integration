@@ -11,6 +11,14 @@ from .const import DOMAIN, SCAN_INTERVAL_SECONDS
 _LOGGER = logging.getLogger(__name__)
 
 
+def _ds(arr: list, n: int = 40) -> list:
+    """Downsample a list to at most *n* evenly-spaced items (last item always kept)."""
+    if len(arr) <= n:
+        return arr
+    step = (len(arr) - 1) / (n - 1)
+    return [arr[round(i * step)] for i in range(n)]
+
+
 def _parse_ts(value: object) -> datetime | None:
     if value is None:
         return None
@@ -194,6 +202,7 @@ class GlpDataCoordinator(DataUpdateCoordinator):
             s_ann  = s.get("annotation") or {}
             s_dp   = s.get("datapoints") or {}
             s_pres = s_dp.get("pressure") or []
+            s_temp = s_dp.get("temperature") or []
             s_dur  = s_dp.get("timeInShot") or []
             s_wt   = s_dp.get("shotWeight") or s_dp.get("weight") or []
             s_dose = s_ann.get("dose")
@@ -203,6 +212,10 @@ class GlpDataCoordinator(DataUpdateCoordinator):
                     s_ratio = round(float(s_wt[-1] / 10) / float(s_dose), 2)
                 except (ValueError, ZeroDivisionError):
                     pass
+            # Compact downsampled curves for the Lovelace card chart (max 40 pts each, ×10 ints)
+            s_dp_small: dict | None = {
+                k: _ds(v) for k, v in [("p", s_pres), ("t", s_temp), ("w", s_wt)] if v
+            } or None
             recent.append({
                 "id":       s.get("id"),
                 "ts":       s.get("timestamp"),
@@ -213,6 +226,7 @@ class GlpDataCoordinator(DataUpdateCoordinator):
                 "ratio":    s_ratio,
                 "pressure": round(sum(s_pres) / len(s_pres) / 10, 2) if s_pres else None,
                 "rating":   int(s_ann["rating"]) if s_ann.get("rating") else None,
+                "dp":       s_dp_small,
             })
         data["recent_shots"] = recent
 
