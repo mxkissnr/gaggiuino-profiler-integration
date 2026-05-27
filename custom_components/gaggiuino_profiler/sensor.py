@@ -324,8 +324,14 @@ class GlpSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         if self.entity_description.key == "machine_status":
+            attrs: dict[str, Any] = {}
             sw = self.coordinator.data.get("switch_entity")
-            return {"switch_entity": sw} if sw else {}
+            if sw:
+                attrs["switch_entity"] = sw
+            recent = self.coordinator.data.get("recent_shots")
+            if recent:
+                attrs["recent_shots"] = recent
+            return attrs
         return {}
 
 

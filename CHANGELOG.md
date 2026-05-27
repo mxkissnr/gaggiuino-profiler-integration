@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.4] – 2026-05-27
+### Added
+- `sensor.*_machine_status` now exposes a `recent_shots` attribute — a compact list of the last 10 shots (id, ts, profile, coffee, duration, yield_g, ratio, pressure, rating) for use by the Lovelace card's shot-navigation feature
+- `binary_sensor.*_brewing` now exposes `profile_name`, `seq`, and `datapoints` attributes during an active shot; `datapoints` contains the live pressure / temperature / weight / flow arrays (same ×10 integer format as stored shots) so the card can render an inline SVG chart updating every 2 s; closes #20
+
 ## [1.9.3] – 2026-05-27
 ### Fixed
 - Maintenance sensor `extra_state_attributes` used snake_case keys (`days_since`, `shots_since`, `last_date`) but the add-on returns camelCase (`daysSince`, `shotsSince`, `lastDate`); all three attributes were always `None` in HA; fixed to match the actual JSON keys; closes #19

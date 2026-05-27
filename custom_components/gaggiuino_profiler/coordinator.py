@@ -188,4 +188,32 @@ class GlpDataCoordinator(DataUpdateCoordinator):
         data["current_profile"]  = profiles_data.get("current")
         data["profile_options_raw"] = profiles_data.get("optionsRaw") or []
 
+        # Recent shots (last 10, compact) — exposed as machine_status attribute for card navigation
+        recent: list[dict] = []
+        for s in reversed(shots[-10:]):
+            s_ann  = s.get("annotation") or {}
+            s_dp   = s.get("datapoints") or {}
+            s_pres = s_dp.get("pressure") or []
+            s_dur  = s_dp.get("timeInShot") or []
+            s_wt   = s_dp.get("shotWeight") or s_dp.get("weight") or []
+            s_dose = s_ann.get("dose")
+            s_ratio = None
+            if s_wt and s_dose:
+                try:
+                    s_ratio = round(float(s_wt[-1] / 10) / float(s_dose), 2)
+                except (ValueError, ZeroDivisionError):
+                    pass
+            recent.append({
+                "id":       s.get("id"),
+                "ts":       s.get("timestamp"),
+                "profile":  s.get("profileName") or (s.get("profile") or {}).get("name"),
+                "coffee":   s_ann.get("coffee"),
+                "duration": round(s_dur[-1] / 10, 1) if s_dur else None,
+                "yield_g":  round(s_wt[-1] / 10, 1) if s_wt else None,
+                "ratio":    s_ratio,
+                "pressure": round(sum(s_pres) / len(s_pres) / 10, 2) if s_pres else None,
+                "rating":   int(s_ann["rating"]) if s_ann.get("rating") else None,
+            })
+        data["recent_shots"] = recent
+
         return data

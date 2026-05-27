@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -53,6 +55,20 @@ class IsBrewingSensor(CoordinatorEntity[GlpLiveCoordinator], BinarySensorEntity)
         if self.coordinator.data is None:
             return None
         return bool(self.coordinator.data.get("isLive"))
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        data = self.coordinator.data
+        if not data:
+            return {}
+        dp = data.get("datapoints")
+        if not dp:
+            return {}
+        return {
+            "profile_name": data.get("profileName"),
+            "seq":          data.get("seq"),
+            "datapoints":   dp,
+        }
 
 
 class PreheatReadySensor(CoordinatorEntity[GlpDataCoordinator], BinarySensorEntity):
