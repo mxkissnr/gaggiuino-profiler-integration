@@ -1,0 +1,51 @@
+name: Bug Report
+description: Something is not working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thanks for taking the time to report a bug!"
+
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+      description: Found in `custom_components/gaggiuino_profiler/manifest.json`
+      placeholder: "e.g. 1.9.4"
+    validations:
+      required: true
+
+  - type: input
+    id: addon_version
+    attributes:
+      label: GLP add-on version
+      description: Visible in HA → Settings → Add-ons → Gaggiuino Local Profiler
+      placeholder: "e.g. 1.62.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: What happened? What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: "Paste relevant output from HA logs (Settings → System → Logs)."
+      render: text
