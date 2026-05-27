@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.9.3] – 2026-05-27
+### Fixed
+- Maintenance sensor `extra_state_attributes` used snake_case keys (`days_since`, `shots_since`, `last_date`) but the add-on returns camelCase (`daysSince`, `shotsSince`, `lastDate`); all three attributes were always `None` in HA; fixed to match the actual JSON keys; closes #19
+- `last_shot_score` sensor always returned `None` — score is calculated client-side only; renamed to `last_shot_rating` (reads `annotation.rating`, 1–5 stars); `sensor.*_last_shot_rating` replaces `sensor.*_last_shot_score`; closes #19
+- Shot-completed event: field renamed from `score` to `rating` to match the sensor rename
+
 ## [1.9.2] – 2026-05-27
 ### Fixed
 - Removed duplicate temperature sensors: `machine_live_temperature` and `machine_target_temperature_live` duplicated the existing `machine_temperature` / `machine_target_temperature` from the main coordinator; closes #18

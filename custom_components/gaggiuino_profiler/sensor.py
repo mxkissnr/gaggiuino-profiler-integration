@@ -67,11 +67,13 @@ SENSORS: tuple[GlpSensorDescription, ...] = (
         icon="mdi:chart-bell-curve",
     ),
     GlpSensorDescription(
-        key="last_shot_score",
-        data_key="last_shot_score",
-        name="Last Shot Score",
+        key="last_shot_rating",
+        data_key="last_shot_rating",
+        name="Last Shot Rating",
         icon="mdi:star-outline",
         state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="★",
+        suggested_display_precision=0,
     ),
     GlpSensorDescription(
         key="last_shot_date",
@@ -383,9 +385,9 @@ class GlpMaintenanceSensor(CoordinatorEntity[GlpDataCoordinator], SensorEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         d = self._task_data()
         return {
-            "days_since":   d.get("days_since"),
-            "shots_since":  d.get("shots_since"),
-            "last_date":    d.get("last_date"),
+            "days_since":   d.get("daysSince"),
+            "shots_since":  d.get("shotsSince"),
+            "last_date":    d.get("lastDate"),
             "pct":          d.get("pct"),
         }
 
