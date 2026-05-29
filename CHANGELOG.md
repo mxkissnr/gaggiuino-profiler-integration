@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.9.6] – 2026-05-29
+### Fixed
+- Coordinator no longer reads `apiToken` from `/api/status` (removed in GLP add-on v1.72.0 security fix); now fetches the token once via `/api/token` on first poll — reachable from the HA Supervisor network without prior authentication; closes #23
+
 ## [1.9.5] – 2026-05-27
 ### Fixed
 - Each `recent_shots` entry now includes a `dp` field with downsampled pressure (`p`), temperature (`t`) and weight (`w`) curves (max 40 points per series, ×10 integers) so the Lovelace card can render a shot chart for every historical shot without additional API calls; closes #22

@@ -55,9 +55,16 @@ class GlpDataCoordinator(DataUpdateCoordinator):
                 r.raise_for_status()
                 status = await r.json()
 
-            # Auto-fetch token from status (no auth required for /api/status)
-            if token := status.get("apiToken"):
-                self._headers = {"X-GLP-Token": token}
+            # Fetch token once via /api/token (reachable from Supervisor network without prior auth)
+            if not self._headers:
+                try:
+                    async with self._session.get(f"{self._url}/api/token", timeout=aiohttp.ClientTimeout(total=5)) as tr:
+                        if tr.ok:
+                            td = await tr.json()
+                            if td.get("apiToken"):
+                                self._headers = {"X-GLP-Token": td["apiToken"]}
+                except Exception:
+                    pass
 
             async with self._session.get(f"{self._url}/shots.json", headers=self._headers, timeout=aiohttp.ClientTimeout(total=10)) as r:
                 r.raise_for_status()
